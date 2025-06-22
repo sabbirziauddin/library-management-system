@@ -2,25 +2,33 @@ import express, { Request, Response } from "express";
 import { BorrowBook } from "../models/borrowBook.model";
 import { Books } from "../models/book.model";
 import { IBookBorrow } from "../interface/bookBorrow.interface";
+import { borrowBookZodSchema } from "../validation/borrowBook.validation";
 
 export const borrowBookRoutes = express.Router();
 
 // create borrow book entry
 borrowBookRoutes.post("/borrow", async (req: Request, res: Response) => {
   try {
+    const parsedborrowBooksData = borrowBookZodSchema.safeParse(req.body);
+    if (!parsedborrowBooksData.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        error: parsedborrowBooksData.error.flatten(),
+      });
+    }
     const { bookId, quantity, dueDate } = req.body;
     const borrowDetails = req.body;
     console.log("borroDetails==>", borrowDetails);
     const foundBook = await Books.findById(bookId);
-    console.log(" ==>found", foundBook);
-    if (!foundBook) {
+    if (!foundBook || foundBook.copies === 0) {
       return res.status(404).json({
         success: false,
-        message: "Book not found",
+        message: "Book  not  available to borrow",
       });
     }
     //check enough copies are available
-    if (foundBook.copies <= quantity) {
+    if (foundBook.copies < quantity) {
       return res.status(400).json({
         success: false,
         message: "Not engouh copies available to borrow",
@@ -53,6 +61,7 @@ borrowBookRoutes.post("/borrow", async (req: Request, res: Response) => {
     });
   }
 });
+
 //get book summary
 borrowBookRoutes.get("/borrow", async (req: Request, res: Response) => {
   try {
@@ -76,7 +85,7 @@ borrowBookRoutes.get("/borrow", async (req: Request, res: Response) => {
       },
       {
         $project: {
-          _id: 1,
+          _id: 0,
           totalQuantity: 1,
           book: {
             title: "$bookInfo.title",

@@ -1,14 +1,22 @@
 import express, { Request, Response } from "express";
 import { Books } from "../models/book.model";
+import { createBookZodSchema } from "../validation/book.validatation";
 
 export const booksRoutes = express.Router();
 
 //create book route
 booksRoutes.post("/books", async (req: Request, res: Response) => {
   try {
-    const booksData = req.body;
-    console.log(booksData);
-    const createBook = await Books.create(booksData);
+    const parsedBooksData = createBookZodSchema.safeParse(req.body);
+    if (!parsedBooksData.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        error: parsedBooksData.error.flatten(),
+      });
+    }
+
+    const createBook = await Books.create(parsedBooksData.data);
     res.status(201).json({
       success: true,
       message: "Book create successfully",
@@ -26,6 +34,7 @@ booksRoutes.post("/books", async (req: Request, res: Response) => {
     });
   }
 });
+
 //get all books route
 // GET /api/books?filter=SCIENCE&sortBy=createdAt&sort=desc&limit=5
 
