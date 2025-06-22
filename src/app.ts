@@ -3,9 +3,8 @@ import express, { Application, Request, Response } from "express";
 import { booksRoutes } from "./controller/books.controller";
 import { borrowBookRoutes } from "./controller/borrowBook.controller";
 
-
-const app: Application = express();
 const port = 4000;
+const app: Application = express();
 //middlewere
 app.use(express.json());
 

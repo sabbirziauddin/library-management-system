@@ -9,7 +9,7 @@ booksRoutes.post("/books", async (req: Request, res: Response) => {
   try {
     const parsedBooksData = createBookZodSchema.safeParse(req.body);
     if (!parsedBooksData.success) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Validation failed",
         error: parsedBooksData.error.flatten(),
@@ -61,7 +61,7 @@ booksRoutes.get("/books", async (req: Request, res: Response) => {
       .sort({ [sortBy as string]: sortOrder })
       .limit(Number(limit));
     if (books.length === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "No books found for the given genre",
         data: [],
@@ -88,18 +88,18 @@ booksRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
   try {
     const book = await Books.findById(bookId);
     if (!book) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Book not found",
       });
     }
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Book fetched successfully",
       data: book,
     });
   } catch (error: any) {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: "Error fetching book",
       error: error.message,
@@ -113,18 +113,18 @@ booksRoutes.delete("/books/:bookId", async (req: Request, res: Response) => {
   try {
     const deletedBook = await Books.findByIdAndDelete(bookId);
     if (!deletedBook) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Book not found",
       });
     }
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Book deleted successfully",
       data: deletedBook,
     });
   } catch (error: any) {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: "Error deleting book",
       error: error.message,
@@ -142,18 +142,18 @@ booksRoutes.patch("/books/:bookId", async (req: Request, res: Response) => {
       new: true,
     });
     if (!updatedBook) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Book not found",
       });
     }
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Book updated successfully",
       data: updatedBook,
     });
   } catch (error: any) {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: "Error updating book",
       error: error.message,

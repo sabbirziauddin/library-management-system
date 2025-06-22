@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import { BorrowBook } from "../models/borrowBook.model";
 import { Books } from "../models/book.model";
-import { IBookBorrow } from "../interface/bookBorrow.interface";
 import { borrowBookZodSchema } from "../validation/borrowBook.validation";
 
 export const borrowBookRoutes = express.Router();
@@ -10,32 +9,33 @@ export const borrowBookRoutes = express.Router();
 borrowBookRoutes.post("/borrow", async (req: Request, res: Response) => {
   try {
     const parsedborrowBooksData = borrowBookZodSchema.safeParse(req.body);
+    console.log("parsedborrowBooksData==>", parsedborrowBooksData.data);
     if (!parsedborrowBooksData.success) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Validation failed",
         error: parsedborrowBooksData.error.flatten(),
       });
     }
-    const { bookId, quantity, dueDate } = req.body;
-    const borrowDetails = req.body;
-    console.log("borroDetails==>", borrowDetails);
+    const { bookId, quantity, dueDate } = parsedborrowBooksData.data!;
     const foundBook = await Books.findById(bookId);
     if (!foundBook || foundBook.copies === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Book  not  available to borrow",
       });
+      return;
     }
     //check enough copies are available
     if (foundBook.copies < quantity) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Not engouh copies available to borrow",
       });
+      return;
     }
     //reduce available copies
-    await foundBook.reduceCopies(quantity); //implement instance methods
+    await foundBook.reduceCopies(quantity.toString()); //implement instance methods
     //create borrow record
     const createBookBook = await BorrowBook.create({
       bookId: bookId,
@@ -108,4 +108,3 @@ borrowBookRoutes.get("/borrow", async (req: Request, res: Response) => {
     });
   }
 });
-

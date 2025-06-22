@@ -12,12 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
 let server;
-const port = 3000;
-const bootstrap = () => __awaiter(void 0, void 0, void 0, function* () {
-    server = app_1.default.listen(port, () => {
-        console.log(`Example app listening on port is on port: ${port}`);
-    });
+const port = 4000;
+const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield mongoose_1.default.connect("mongodb+srv://mongodb:mongodb@cluster0.uqid44n.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0");
+        server = app_1.default.listen(port, () => {
+            console.log(`server is running on : ${port}`);
+        });
+    }
+    catch (error) {
+        console.log("Error during main:", error);
+    }
 });
-bootstrap();
+main();
