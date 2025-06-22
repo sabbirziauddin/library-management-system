@@ -14,11 +14,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
+const dotenv_1 = __importDefault(require("dotenv"));
 let server;
-const port = 4000;
+dotenv_1.default.config();
+const port = process.env.PORT || 5000;
+const uri = process.env.MONGODB_URI || "";
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect("mongodb+srv://mongodb:mongodb@cluster0.uqid44n.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0");
+        yield mongoose_1.default.connect(uri);
+        console.log("mongoose are connected");
         server = app_1.default.listen(port, () => {
             console.log(`server is running on : ${port}`);
         });

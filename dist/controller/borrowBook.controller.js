@@ -22,8 +22,9 @@ exports.borrowBookRoutes = express_1.default.Router();
 exports.borrowBookRoutes.post("/borrow", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const parsedborrowBooksData = borrowBook_validation_1.borrowBookZodSchema.safeParse(req.body);
+        console.log("parsedborrowBooksData==>", parsedborrowBooksData.data);
         if (!parsedborrowBooksData.success) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "Validation failed",
                 error: parsedborrowBooksData.error.flatten(),
@@ -32,17 +33,19 @@ exports.borrowBookRoutes.post("/borrow", (req, res) => __awaiter(void 0, void 0,
         const { bookId, quantity, dueDate } = parsedborrowBooksData.data;
         const foundBook = yield book_model_1.Books.findById(bookId);
         if (!foundBook || foundBook.copies === 0) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: "Book  not  available to borrow",
             });
+            return;
         }
         //check enough copies are available
         if (foundBook.copies < quantity) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "Not engouh copies available to borrow",
             });
+            return;
         }
         //reduce available copies
         yield foundBook.reduceCopies(quantity.toString()); //implement instance methods
