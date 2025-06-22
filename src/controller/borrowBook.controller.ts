@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { BorrowBook } from "../models/borrowBook.model";
 import { Books } from "../models/book.model";
+import { IBookBorrow } from "../interface/bookBorrow.interface";
 
 export const borrowBookRoutes = express.Router();
 
@@ -99,22 +100,3 @@ borrowBookRoutes.get("/borrow", async (req: Request, res: Response) => {
   }
 });
 
-//get borrowBook
-// borrowBookRoutes.get("/borrowBook", async (req: Request, res: Response) => {
-//   try {
-//     //populate books details in borrowbook model
-//     const borrowBooks = await BorrowBook.find();
-//     console.log("333", borrowBooks);
-//     res.status(201).json({
-//       success: true,
-//       message: "Borrowed books fetched successfully",
-//       data: borrowBooks,
-//     });
-//   } catch (error: any) {
-//     res.status(500).json({
-//       success: false,
-//       message: "Error fetching borrowed books",
-//       error: error.message,
-//     });
-//   }
-// });
